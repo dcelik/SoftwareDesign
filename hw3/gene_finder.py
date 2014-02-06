@@ -2,7 +2,9 @@
 """
 Created on Sun Feb  2 11:24:42 2014
 
-@author: YOUR NAME HERE
+@author: Deniz Celik
+
+Skeleton provided by Paul Ruvolo
 """
 
 # you may find it useful to import these variables (although you are not required to use them)
@@ -25,13 +27,28 @@ def coding_strand_to_AA(dna):
         returns: a string containing the sequence of amino acids encoded by the
                  the input DNA fragment
     """
-    
-    # YOUR IMPLEMENTATION HERE
+    dnainp = dna
+    protein = ''
+    if len(dnainp)<3:
+        print "ERROR: The provided fragment is too short to contain any codons."
+    elif len(dnainp)%3 is not 0:
+        print "Warning: The provided DNA fragment does not contain an integer number of codons. Excess bases were leftout."
+    while len(dnainp) >=3:
+        cod = dnainp[:3]
+        for i in codons:
+            for j in i:
+                if j == cod:
+                    protein = protein + aa[codons.index(i)]
+        dnainp = dnainp[3:]
+    return protein
 
 def coding_strand_to_AA_unit_tests():
     """ Unit tests for the coding_strand_to_AA function """
-        
-    # YOUR IMPLEMENTATION HERE
+    print "input: GTTGACAGTACGTACAGGGAA, "+"output: "+coding_strand_to_AA("GTTGACAGTACGTACAGGGAA")+", actual output: VDSTYRE"
+    print "input: TTATTGCTTATTATCATG, "+"output: "+coding_strand_to_AA("TTATTGCTTATTATCATG")+", actual output: LLLIIM"
+    print "input: TTTTTAATTATGGTTTCTCCTACTGCTTATTAACATCAAAATAAAGATGAATGTTGGCGTGGT, "+"output: "+coding_strand_to_AA("TTTTTAATTATGGTTTCTCCTACTGCTTATTAACATCAAAATAAAGATGAATGTTGGCGTGGT")+", actual output: FLIMVSPTAY|HQNKDECWRG"
+
+coding_strand_to_AA_unit_tests()
 
 def get_reverse_complement(dna):
     """ Computes the reverse complementary sequence of DNA for the specfied DNA
