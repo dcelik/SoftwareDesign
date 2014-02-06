@@ -30,7 +30,7 @@ def coding_strand_to_AA(dna):
     dnainp = dna
     protein = ''
     if len(dnainp)<3:
-        print "ERROR: The provided fragment is too short to contain any codons."
+        return "ERROR: The provided fragment is too short to contain any codons."
     elif len(dnainp)%3 is not 0:
         print "Warning: The provided DNA fragment does not contain an integer number of codons. Excess bases were leftout."
     while len(dnainp) >=3:
@@ -47,8 +47,7 @@ def coding_strand_to_AA_unit_tests():
     print "input: GTTGACAGTACGTACAGGGAA, "+"output: "+coding_strand_to_AA("GTTGACAGTACGTACAGGGAA")+", actual output: VDSTYRE"
     print "input: TTATTGCTTATTATCATG, "+"output: "+coding_strand_to_AA("TTATTGCTTATTATCATG")+", actual output: LLLIIM"
     print "input: TTTTTAATTATGGTTTCTCCTACTGCTTATTAACATCAAAATAAAGATGAATGTTGGCGTGGT, "+"output: "+coding_strand_to_AA("TTTTTAATTATGGTTTCTCCTACTGCTTATTAACATCAAAATAAAGATGAATGTTGGCGTGGT")+", actual output: FLIMVSPTAY|HQNKDECWRG"
-
-coding_strand_to_AA_unit_tests()
+    print "input: TT, " + "output: "+coding_strand_to_AA("TT")+", actual output: ERROR: The provided fragment is too short to contain any codons."
 
 def get_reverse_complement(dna):
     """ Computes the reverse complementary sequence of DNA for the specfied DNA
@@ -58,12 +57,16 @@ def get_reverse_complement(dna):
         returns: the reverse complementary DNA sequence represented as a string
     """
     
-    # YOUR IMPLEMENTATION HERE
-    
+    if len(dna)==1:
+        return dna
+    return dna[len(dna)-1:] + get_reverse_complement(dna[:len(dna)-1])
+
 def get_reverse_complement_unit_tests():
     """ Unit tests for the get_complement function """
-        
-    # YOUR IMPLEMENTATION HERE    
+    print "input: GTTGACAGTACGTACAGGGAA, "+"output: "+ get_reverse_complement("GTTGACAGTACGTACAGGGAA") +", actual output: AAGGGACATGCATGACAGTTG"  
+    print "input: TTATTGCTTATTATCATG, "+"output: "+get_reverse_complement("TTATTGCTTATTATCATG")+", actual output: GTACTATTATTCGTTATT"
+    print "input: ATC, TAG"+"output: "+get_reverse_complement("ATC")+", actual output: CTA"
+    print "input: CTA, "+"output: "+get_reverse_complement("CTA")+", actual output: ATC"
 
 def rest_of_ORF(dna):
     """ Takes a DNA sequence that is assumed to begin with a start codon and returns
@@ -73,14 +76,17 @@ def rest_of_ORF(dna):
         dna: a DNA sequence
         returns: the open reading frame represented as a string
     """
-    
-    # YOUR IMPLEMENTATION HERE
+    if dna[:3]== "TAG" or dna[:3]=="TAA" or dna[:3]=="TGA" or len(dna)<3:
+        return ""
+    return dna[:3]+rest_of_ORF(dna[3:])
 
 def rest_of_ORF_unit_tests():
     """ Unit tests for the rest_of_ORF function """
-        
-    # YOUR IMPLEMENTATION HERE
-        
+    print "input: CTA, "+"output: "+rest_of_ORF("CTA")+", actual output: CTA"
+    print "input: GTCACTTAGGGTTTT, "+"output: "+rest_of_ORF("GTCACTTAGGGTTTT")+", actual output: GTCACT"
+    print "input: AAATTTTATAATGGGTGAAGTTAG, "+"output: "+rest_of_ORF("AAATTTTATAATGGGTGAAGTTAG")+", actual output: AAATTTTATAATGGG"
+    print "input: TATATGGAGGATAATAGTTGATAATAG, "+"output: "+rest_of_ORF("TATATGGAGGATAATAGTTGATAATAG")+", actual output: TATATGGAGGATAATAGT"
+
 def find_all_ORFs_oneframe(dna):
     """ Finds all non-nested open reading frames in the given DNA sequence and returns
         them as a list.  This function should only find ORFs that are in the default
