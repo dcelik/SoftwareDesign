@@ -17,7 +17,6 @@ def collapse(L):
         output = output + s
     return output
 
-
 def coding_strand_to_AA(dna):
     """ Computes the Protein encoded by a sequence of DNA.  This function
         does not check for start and stop codons (it assumes that the input
@@ -76,6 +75,8 @@ def rest_of_ORF(dna):
         dna: a DNA sequence
         returns: the open reading frame represented as a string
     """
+    if len(dna)<3:
+        return dna
     if dna[:3]== "TAG" or dna[:3]=="TAA" or dna[:3]=="TGA" or len(dna)<3:
         return ""
     return dna[:3]+rest_of_ORF(dna[3:])
@@ -97,8 +98,15 @@ def find_all_ORFs_oneframe(dna):
         dna: a DNA sequence
         returns: a list of non-nested ORFs
     """
-     
-    # YOUR IMPLEMENTATION HERE        
+    dnainp = dna
+    orfs = []
+    while len(dnainp)>3:
+        orfs.append(rest_of_ORF(dnainp))
+        minuslen = len(rest_of_ORF(dnainp))+3
+        dnainp = dnainp[minuslen:]
+    return orfs
+    
+print find_all_ORFs_oneframe("ATGCATGAATGTAGATAGATGTGCCC")
         
 def find_all_ORFs(dna):
     """ Finds all non-nested open reading frames in the given DNA sequence in all 3
