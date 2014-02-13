@@ -50,8 +50,6 @@ def coding_strand_to_AA_unit_tests():
     print "input: TTTTTAATTATGGTTTCTCCTACTGCTTATTAACATCAAAATAAAGATGAATGTTGGCGTGGT, "+"output: "+coding_strand_to_AA("TTTTTAATTATGGTTTCTCCTACTGCTTATTAACATCAAAATAAAGATGAATGTTGGCGTGGT")+", actual output: FLIMVSPTAY|HQNKDECWRG"
     print "input: TT, " + "output: "+coding_strand_to_AA("TT")+", actual output: ERROR: The provided fragment is too short to contain any codons."
 
-print "input: GTTGACAGTACGTACAGGGAA, "+"output: "+coding_strand_to_AA("GTTGACAGTACGTACAGGGAA")+", actual output: VDSTYRE"
-
 def get_reverse_complement(dna):
     """ Computes the reverse complementary sequence of DNA for the specfied DNA
         sequence
@@ -84,10 +82,11 @@ def rest_of_ORF(dna):
         dna: a DNA sequence
         returns: the open reading frame represented as a string
     """
-    if len(dna)<3:
-        return dna
+    
     if dna[:3]== "TAG" or dna[:3]=="TAA" or dna[:3]=="TGA" or len(dna)<3:
         return ""
+    if len(dna)<=3:
+        return dna
     return dna[:3]+rest_of_ORF(dna[3:])
 
 def rest_of_ORF_unit_tests():
@@ -112,9 +111,12 @@ def find_all_ORFs_oneframe(dna):
     if len(dnainp)<3:
         orfs.append(dna)
     while len(dnainp)>=3:
-        orfs.append(rest_of_ORF(dnainp))
-        minuslen = len(rest_of_ORF(dnainp))+3
-        dnainp = dnainp[minuslen:]
+        if dnainp[:3]=='ATG':
+            orfs.append(rest_of_ORF(dnainp))
+            minuslen = len(rest_of_ORF(dnainp))+3
+            dnainp = dnainp[minuslen:]
+        else:
+            dnainp = dnainp[3:]
     y = [s for s in orfs if s!='']
     return y
     
@@ -137,10 +139,10 @@ def find_all_ORFs(dna):
 def find_all_ORFs_unit_tests():
     """ Unit tests for the find_all_ORFs function """
         
-    print "input: CTA, "+"output: "+ ",".join(find_all_ORFs("CTA"))+", actual output: CTA,TA,A"
-    print "input: GTCACTTAGGGTTTT, "+"output: "+",".join(find_all_ORFs("GTCACTTAGGGTTTT"))+", actual output: GTCACT,GGTTTT,TCACTTAGGGTTTT,CACTTAGGGTTTT"
-    print "input: AAATTTTATAATGGGTGAAGTTAG, "+"output: "+",".join(find_all_ORFs("AAATTTTATAATGGGTGAAGTTAG"))+", actual output: AAATTTTATAATGGG,AGT,AATTTTATAATGGGTGAAGTTAG,ATTTTA,TGGGTGAAGTTAG"
-    print "input: TATATGGAGGATAATAGTTGATAATAG, "+"output: "+ ",".join(find_all_ORFs("TATATGGAGGATAATAGTTGATAATAG"))+", actual output: TATATGGAGGATAATAGT,ATATGGAGGATAATAGTTGATAATAG,TATGGAGGA,TTGATAATAG" 
+    print "input: ATGCTA, "+"output: "+ ",".join(find_all_ORFs("ATGCTA"))+", actual output: CTA"
+    print "input: GTCACTTATGGGTTT, "+"output: "+",".join(find_all_ORFs("ATGGATGCTTAGGGATGTTT"))+", actual output: GTCACT,GGTTTT,TCACTTAGGGTTTT,CACTTAGGGTTTT"
+    print "input: AAATTTTATAATGGGTGAAGTTAG, "+"output: "+",".join(find_all_ORFs("AAATTTTATAATGGGTGAAGTTAG"))+", actual output: ATGGGTGAAGTT"
+    print "input: TATATGGAGGATAATAGTTGATAATAG, "+"output: "+ ",".join(find_all_ORFs("TATATGGAGGATAATAGTTGATAATAG"))+", actual output: ATGGAGGATAATAGT" 
 
 def find_all_ORFs_both_strands(dna):
     """ Finds all non-nested open reading frames in the given DNA sequence on both
