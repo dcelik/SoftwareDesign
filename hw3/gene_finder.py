@@ -10,6 +10,7 @@ Skeleton provided by Paul Ruvolo
 # you may find it useful to import these variables (although you are not required to use them)
 from amino_acids import aa, codons
 from random import shuffle
+#from load import *
 
 def collapse(L):
     """ Converts a list of strings to a string by concatenating all elements of the list """
@@ -201,6 +202,5 @@ def gene_finder(dna, threshold):
     orfs = [i for i in orfs if len(i)>threshold]
     orfs = [coding_strand_to_AA(i) for i in orfs]
     return orfs
-print gene_finder("GTCACTTAGGGTTTT",8)    
     
-    
+sampledna = load_seq("./data/X73525.fa")    
