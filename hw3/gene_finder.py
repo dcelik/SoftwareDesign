@@ -9,6 +9,7 @@ Skeleton provided by Paul Ruvolo
 
 # you may find it useful to import these variables (although you are not required to use them)
 from amino_acids import aa, codons
+from random import shuffle
 
 def collapse(L):
     """ Converts a list of strings to a string by concatenating all elements of the list """
@@ -30,8 +31,8 @@ def coding_strand_to_AA(dna):
     protein = ''
     if len(dnainp)<3:
         return "ERROR: The provided fragment is too short to contain any codons."
-    elif len(dnainp)%3 is not 0:
-        print "Warning: The provided DNA fragment does not contain an integer number of codons. Excess bases were leftout."
+#    elif len(dnainp)%3 is not 0:
+#        print "Warning: The provided DNA fragment does not contain an integer number of codons. Excess bases were leftout."
     while len(dnainp) >=3:
         cod = dnainp[:3]
         for i in codons:
@@ -48,6 +49,7 @@ def coding_strand_to_AA_unit_tests():
     print "input: TTTTTAATTATGGTTTCTCCTACTGCTTATTAACATCAAAATAAAGATGAATGTTGGCGTGGT, "+"output: "+coding_strand_to_AA("TTTTTAATTATGGTTTCTCCTACTGCTTATTAACATCAAAATAAAGATGAATGTTGGCGTGGT")+", actual output: FLIMVSPTAY|HQNKDECWRG"
     print "input: TT, " + "output: "+coding_strand_to_AA("TT")+", actual output: ERROR: The provided fragment is too short to contain any codons."
 
+
 def get_reverse_complement(dna):
     """ Computes the reverse complementary sequence of DNA for the specfied DNA
         sequence
@@ -56,16 +58,21 @@ def get_reverse_complement(dna):
         returns: the reverse complementary DNA sequence represented as a string
     """
     
-    if len(dna)==1:
-        return dna
-    return dna[len(dna)-1:] + get_reverse_complement(dna[:len(dna)-1])
-
+    dna = dna.replace('T','N')
+    dna = dna.replace('A','T')
+    dna = dna.replace('N','A')
+    dna = dna.replace('C','N')
+    dna = dna.replace('G','C')
+    dna = dna.replace('N','G')
+    dna = dna[::-1]
+    return dna
+    
 def get_reverse_complement_unit_tests():
     """ Unit tests for the get_complement function """
     print "input: GTTGACAGTACGTACAGGGAA, "+"output: "+ get_reverse_complement("GTTGACAGTACGTACAGGGAA") +", actual output: AAGGGACATGCATGACAGTTG"  
     print "input: TTATTGCTTATTATCATG, "+"output: "+get_reverse_complement("TTATTGCTTATTATCATG")+", actual output: GTACTATTATTCGTTATT"
-    print "input: ATC, TAG"+"output: "+get_reverse_complement("ATC")+", actual output: CTA"
-    print "input: CTA, "+"output: "+get_reverse_complement("CTA")+", actual output: ATC"
+    print "input: ATC, "+"output: "+get_reverse_complement("ATC")+", actual output: GAT"
+    print "input: CTA, "+"output: "+get_reverse_complement("CTA")+", actual output: TAG"
 
 def rest_of_ORF(dna):
     """ Takes a DNA sequence that is assumed to begin with a start codon and returns
@@ -100,11 +107,14 @@ def find_all_ORFs_oneframe(dna):
     """
     dnainp = dna
     orfs = []
-    while len(dnainp)>3:
+    if len(dnainp)<3:
+        orfs.append(dna)
+    while len(dnainp)>=3:
         orfs.append(rest_of_ORF(dnainp))
         minuslen = len(rest_of_ORF(dnainp))+3
         dnainp = dnainp[minuslen:]
-    return orfs
+    y = [s for s in orfs if s!='']
+    return y
     
         
 def find_all_ORFs(dna):
@@ -125,7 +135,10 @@ def find_all_ORFs(dna):
 def find_all_ORFs_unit_tests():
     """ Unit tests for the find_all_ORFs function """
         
-    print find_all_ORFs("ATGCATGAATGTAGATAGATGTGCCC") 
+    print "input: CTA, "+"output: "+ ",".join(find_all_ORFs("CTA"))+", actual output: CTA,TA,A"
+    print "input: GTCACTTAGGGTTTT, "+"output: "+",".join(find_all_ORFs("GTCACTTAGGGTTTT"))+", actual output: GTCACT,GGTTTT,TCACTTAGGGTTTT,CACTTAGGGTTTT"
+    print "input: AAATTTTATAATGGGTGAAGTTAG, "+"output: "+",".join(find_all_ORFs("AAATTTTATAATGGGTGAAGTTAG"))+", actual output: AAATTTTATAATGGG,AGT,AATTTTATAATGGGTGAAGTTAG,ATTTTA,TGGGTGAAGTTAG"
+    print "input: TATATGGAGGATAATAGTTGATAATAG, "+"output: "+ ",".join(find_all_ORFs("TATATGGAGGATAATAGTTGATAATAG"))+", actual output: TATATGGAGGATAATAGT,ATATGGAGGATAATAGTTGATAATAG,TATGGAGGA,TTGATAATAG" 
 
 def find_all_ORFs_both_strands(dna):
     """ Finds all non-nested open reading frames in the given DNA sequence on both
@@ -135,27 +148,26 @@ def find_all_ORFs_both_strands(dna):
         returns: a list of non-nested ORFs
     """
     return find_all_ORFs(dna) + (find_all_ORFs(get_reverse_complement(dna)))
-         
-print find_all_ORFs_both_strands("ATGCATGAATGTAGATAGATGTGCCC")
      
      
 def find_all_ORFs_both_strands_unit_tests():
     """ Unit tests for the find_all_ORFs_both_strands function """
+    print "input: CTA, "+"output: "+ ",".join(find_all_ORFs_both_strands("CTA"))+", actual output: CTA,TA,A,AG,G"
+    print "input: GTCACTTAGGGTTTT, "+"output: "+",".join(find_all_ORFs_both_strands("GTCACTTAGGGTTTT"))+", actual output: GTCACT,GGTTTT,TCACTTAGGGTTTT,CACTTAGGGTTTT,AAAACCCTAAGTGAC,AAACCC,GTGAC,AACCCTAAG"
+    print "input: AAATTTTATAATGGGTGAAGTTAG, "+"output: "+",".join(find_all_ORFs_both_strands("AAATTTTATAATGGGTGAAGTTAG"))+", actual output: AAATTTTATAATGGG,AGT,AATTTTATAATGGGTGAAGTTAG,ATTTTA,TGGGTGAAGTTAG,CTAACTTCACCCATTATAAAATTT,CTTCACCCATTA,AATTT,AACTTCACCCATTATAAAATTT"
+    print "input: TATATGGAGGATAATAGTTGATAATAG, "+"output: "+ ",".join(find_all_ORFs_both_strands("TATATGGAGGATAATAGTTGATAATAG"))+", actual output: TATATGGAGGATAATAGT,ATATGGAGGATAATAGTTGATAATAG,TATGGAGGA,TTGATAATAG,CTATTATCAACTATTATCCTCCATATA,TATTATCAACTATTATCCTCCATATA,ATTATCAACTATTATCCTCCATATA" 
 
-    # YOUR IMPLEMENTATION HERE
 
 def longest_ORF(dna):
     """ Finds the longest ORF on both strands of the specified DNA and returns it
         as a string"""
     orfs = find_all_ORFs_both_strands(dna)
+    print orfs
     maxorf =orfs[1];
     for s in orfs:
         if len(s)>len(maxorf):
             maxorf=s
     return maxorf
-        
-print longest_ORF("ATGCATGAATGTAGATAGATGTGCCC")
-    # YOUR IMPLEMENTATION HERE
 
 def longest_ORF_noncoding(dna, num_trials):
     """ Computes the maximum length of the longest ORF over num_trials shuffles
@@ -165,7 +177,15 @@ def longest_ORF_noncoding(dna, num_trials):
         num_trials: the number of random shuffles
         returns: the maximum length longest ORF """
 
-    # YOUR IMPLEMENTATION HERE
+    dnal = list(dna)
+    maxorf = longest_ORF(dna)
+    for i in range(num_trials):
+        shuffle(dnal)
+        orf = longest_ORF(collapse(dnal))
+        print orf
+        if len(maxorf)<len(orf):
+            maxorf = orf
+    return maxorf
 
 def gene_finder(dna, threshold):
     """ Returns the amino acid sequences coded by all genes that have an ORF
@@ -177,5 +197,10 @@ def gene_finder(dna, threshold):
         returns: a list of all amino acid sequences whose ORFs meet the minimum
                  length specified.
     """
-
-    # YOUR IMPLEMENTATION HERE
+    orfs = find_all_ORFs_both_strands(dna)
+    orfs = [i for i in orfs if len(i)>threshold]
+    orfs = [coding_strand_to_AA(i) for i in orfs]
+    return orfs
+print gene_finder("GTCACTTAGGGTTTT",8)    
+    
+    
