@@ -10,7 +10,7 @@ Skeleton provided by Paul Ruvolo
 # you may find it useful to import these variables (although you are not required to use them)
 from amino_acids import aa, codons
 from random import shuffle
-#from load import *
+from load import *
 
 def collapse(L):
     """ Converts a list of strings to a string by concatenating all elements of the list """
@@ -42,7 +42,7 @@ def coding_strand_to_AA(dna):
                     protein = protein + aa[codons.index(i)]
         dnainp = dnainp[3:]
     return protein
-
+    
 def coding_strand_to_AA_unit_tests():
     """ Unit tests for the coding_strand_to_AA function """
     print "input: GTTGACAGTACGTACAGGGAA, "+"output: "+coding_strand_to_AA("GTTGACAGTACGTACAGGGAA")+", actual output: VDSTYRE"
@@ -50,6 +50,7 @@ def coding_strand_to_AA_unit_tests():
     print "input: TTTTTAATTATGGTTTCTCCTACTGCTTATTAACATCAAAATAAAGATGAATGTTGGCGTGGT, "+"output: "+coding_strand_to_AA("TTTTTAATTATGGTTTCTCCTACTGCTTATTAACATCAAAATAAAGATGAATGTTGGCGTGGT")+", actual output: FLIMVSPTAY|HQNKDECWRG"
     print "input: TT, " + "output: "+coding_strand_to_AA("TT")+", actual output: ERROR: The provided fragment is too short to contain any codons."
 
+print "input: GTTGACAGTACGTACAGGGAA, "+"output: "+coding_strand_to_AA("GTTGACAGTACGTACAGGGAA")+", actual output: VDSTYRE"
 
 def get_reverse_complement(dna):
     """ Computes the reverse complementary sequence of DNA for the specfied DNA
@@ -163,7 +164,6 @@ def longest_ORF(dna):
     """ Finds the longest ORF on both strands of the specified DNA and returns it
         as a string"""
     orfs = find_all_ORFs_both_strands(dna)
-    print orfs
     maxorf =orfs[1];
     for s in orfs:
         if len(s)>len(maxorf):
@@ -177,16 +177,14 @@ def longest_ORF_noncoding(dna, num_trials):
         dna: a DNA sequence
         num_trials: the number of random shuffles
         returns: the maximum length longest ORF """
-
     dnal = list(dna)
-    maxorf = longest_ORF(dna)
+    maxorf = 0
     for i in range(num_trials):
         shuffle(dnal)
-        orf = longest_ORF(collapse(dnal))
-        print orf
-        if len(maxorf)<len(orf):
+        orf = len(longest_ORF(collapse(dnal)))
+        if maxorf<orf:
             maxorf = orf
-    return maxorf
+    return maxorf   
 
 def gene_finder(dna, threshold):
     """ Returns the amino acid sequences coded by all genes that have an ORF
@@ -203,4 +201,7 @@ def gene_finder(dna, threshold):
     orfs = [coding_strand_to_AA(i) for i in orfs]
     return orfs
     
-sampledna = load_seq("./data/X73525.fa")    
+sampledna = load_seq("./data/X73525.fa")
+samplethresh = longest_ORF_noncoding(sampledna,1500)
+print samplethresh
+print gene_finder(sampledna, samplethresh)
