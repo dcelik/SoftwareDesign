@@ -46,7 +46,7 @@ def sin_pi(a):
     return math.sin(math.pi*a)
     
 def sin_xy(a,b):
-    return math.sin(math.pi*a*a*randint(1,10))
+    return math.sin(math.pi*a*b*randint(1,10))
 
 def x(a,b):
     return a
