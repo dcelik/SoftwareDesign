@@ -16,7 +16,7 @@ def build_random_function(min_depth, max_depth):
         desired functions.
     """
     num = randint(1,5)
-    if min_depth<=0 and max_depth<0:
+    if min_depth<=0 and max_depth>0:
         if randint(0,10)>5:
             max_depth=0
     if max_depth==0:
@@ -87,9 +87,9 @@ def remap_interval(val, input_interval_start, input_interval_end, output_interva
     return(output_interval_end-output_interval_start)*float((val-input_interval_start))/float((input_interval_end-input_interval_start))+output_interval_start
 
 def main():
-    red = build_random_function(10,10)
-    green = build_random_function(10,10)
-    blue = build_random_function(10,10)
+    red = build_random_function(4,17)
+    green = build_random_function(3,18)
+    blue = build_random_function(2,20)
     im = Image.new("RGB",(350,350))
     horz,vert = im.size
     pixels = im.load()
@@ -105,7 +105,7 @@ def main():
               b = int(remap_interval(b,-1,1,0,255))
               pixels[i,j] = (r,g,b)
               
-    im.save("Deniz6","png")
+    im.save("Deniz9","png")
               
 if __name__=="__main__":
     main()      
