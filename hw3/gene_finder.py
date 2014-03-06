@@ -35,12 +35,12 @@ def coding_strand_to_AA(dna):
 #    elif len(dnainp)%3 is not 0:
 #        print "Warning: The provided DNA fragment does not contain an integer number of codons. Excess bases were leftout."
     while len(dnainp) >=3:
-        cod = dnainp[:3]
+        cod = dnainp[:3]	#Interesting use of substringing and not a bad idea.
         for i in codons:
             for j in i:
                 if j == cod:
-                    protein = protein + aa[codons.index(i)]
-        dnainp = dnainp[3:]
+                    protein = protein + aa[codons.index(i)]	#Consider += for brevity
+        dnainp = dnainp[3:]	#Good use of substring with empty arguments
     return protein
     
 def coding_strand_to_AA_unit_tests():
@@ -83,11 +83,19 @@ def rest_of_ORF(dna):
         returns: the open reading frame represented as a string
     """
     
-    if dna[:3]== "TAG" or dna[:3]=="TAA" or dna[:3]=="TGA" or len(dna)<3:
+    #This function is bugged! My unit tests are returning this:
+	#input: ATGTGAA, expected output: ATG , actual output: ATG
+	#input: ATGAGATAGG, expected output: ATGAGA, actual output: ATGAGA
+	#input: ATGGGGAGCTTGA, expected output: ATGGGGAGCTTGA, actual output: ATGGGGAGCTTG
+	#This bug is cascading through the next three functions.
+
+    if dna[:3]== "TAG" or dna[:3]=="TAA" or dna[:3]=="TGA" or len(dna)<3:	#One way to make this a bit more streamlined would be to 
+    																		# reduce it to "if dna[:3] in ['TAG','TAA','TGA'] and len(dna<3):"
+    																		# This is a matter of preference though.
         return ""
     if len(dna)<=3:
         return dna
-    return dna[:3]+rest_of_ORF(dna[3:])
+    return dna[:3]+rest_of_ORF(dna[3:])	#Interesting use of recursion. Good thought. Unfortunately, this truncation is generating your bug.
 
 def rest_of_ORF_unit_tests():
     """ Unit tests for the rest_of_ORF function """
@@ -106,32 +114,42 @@ def find_all_ORFs_oneframe(dna):
         dna: a DNA sequence
         returns: a list of non-nested ORFs
     """
-<<<<<<< HEAD
+
+    # This is a merge conflict. It will render your code unrunnable and should
+    # definately be resolved before you submit your code. You get a freebie on this
+    # one, because I don't believe that we (the NINJAs) have gone over git merge
+    # conflicts thoroughly enough yet. In future, resolve merge conflicts like this
+    # by manually deleting everything between the <<<<<<<< and >>>>>>>>>>
+#<<<<<<< HEAD
+
+	#Your earlier bug is cascading through this function, but its only counted once for grading purposes
+	
     dnainp = dna
     orfs = []
     if len(dnainp)<3:
         orfs.append(dna)
-    while len(dnainp)>=3:
+    while len(dnainp)>=3:	#I think this is causing your bug by only encoding in 3s you are dropping any
+    						# trailing letters off the string.
         if dnainp[:3]=='ATG':
             orfs.append(rest_of_ORF(dnainp))
             minuslen = len(rest_of_ORF(dnainp))+3
             dnainp = dnainp[minuslen:]
         else:
             dnainp = dnainp[3:]
-    y = [s for s in orfs if s!='']
+    y = [s for s in orfs if s!='']	#List comprehensions - fancy. Great thing to pick up from Networks
     return y
     
         
-=======
+# =======
      
-    # YOUR IMPLEMENTATION HERE        
+#     # YOUR IMPLEMENTATION HERE        
      
-def find_all_ORFs_oneframe_unit_tests():
-    """ Unit tests for the find_all_ORFs_oneframe function """
+# def find_all_ORFs_oneframe_unit_tests():
+#     """ Unit tests for the find_all_ORFs_oneframe function """
 
-    # YOUR IMPLEMENTATION HERE
+#     # YOUR IMPLEMENTATION HERE
 
->>>>>>> upstream/master
+# >>>>>>> upstream/master
 def find_all_ORFs(dna):
     """ Finds all non-nested open reading frames in the given DNA sequence in all 3
         possible frames and returns them as a list.  By non-nested we mean that if an
@@ -145,7 +163,7 @@ def find_all_ORFs(dna):
     ans.extend(find_all_ORFs_oneframe(dna[1:]))
     ans.extend(find_all_ORFs_oneframe(dna[2:]))
     return ans
-    
+   	#Yep, thats about all you need for this function.
     
 def find_all_ORFs_unit_tests():
     """ Unit tests for the find_all_ORFs function """
@@ -163,6 +181,7 @@ def find_all_ORFs_both_strands(dna):
         returns: a list of non-nested ORFs
     """
     return find_all_ORFs(dna) + (find_all_ORFs(get_reverse_complement(dna)))
+    #Nice one-liner
      
      
 def find_all_ORFs_both_strands_unit_tests():
@@ -182,6 +201,7 @@ def longest_ORF(dna):
         if len(s)>len(maxorf):
             maxorf=s
     return maxorf
+    #Consider using the max function next time.
 
 def longest_ORF_unit_tests():
     """ Unit tests for the longest_ORF function """
@@ -219,7 +239,7 @@ def gene_finder(dna, threshold):
     orfs = [coding_strand_to_AA(i) for i in orfs]
     return orfs
     
-sampledna = load_seq("./data/X73525.fa")
-samplethresh = longest_ORF_noncoding(sampledna,1500)
-print samplethresh
-print gene_finder(sampledna, samplethresh)
+# sampledna = load_seq("./data/X73525.fa")
+# samplethresh = longest_ORF_noncoding(sampledna,1500)
+# print samplethresh
+# print gene_finder(sampledna, samplethresh)
